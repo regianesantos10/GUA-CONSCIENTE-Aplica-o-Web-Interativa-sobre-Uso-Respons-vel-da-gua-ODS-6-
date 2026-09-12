@@ -1,0 +1,409 @@
+
+===== package.json =====
+{
+  "name": "agua-consciente-react-ods6",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "latest",
+    "vite": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "bootstrap": "latest"
+  },
+  "devDependencies": {}
+}
+
+
+===== index.html =====
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Aplicação Água Consciente - ODS 6, desenvolvida em React com consumo de API e interatividade." />
+    <title>Água Consciente - ODS 6</title>
+  </head>
+  <body>
+    <noscript>Esta aplicação precisa do JavaScript habilitado para funcionar corretamente.</noscript>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+
+
+===== src/main.jsx =====
+import React from 'react';
+import { createRoot } from 'react-dom/client';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import './styles/global.css';
+import App from './App.jsx';
+
+createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
+
+
+===== src/App.jsx =====
+import React from 'react';
+import Header from './components/Header.jsx';
+import Hero from './components/Hero.jsx';
+import CardsODS from './components/CardsODS.jsx';
+import Dicas from './components/Dicas.jsx';
+import ApiClima from './components/ApiClima.jsx';
+import FormularioParticipacao from './components/FormularioParticipacao.jsx';
+import Footer from './components/Footer.jsx';
+
+export default function App() {
+  const [paginaAtual, setPaginaAtual] = React.useState('inicio');
+
+  React.useEffect(() => {
+    const titulo = {
+      inicio: 'Água Consciente - ODS 6',
+      dicas: 'Dicas - Água Consciente',
+      clima: 'Dados da API - Água Consciente',
+      participe: 'Participe - Água Consciente'
+    };
+    document.title = titulo[paginaAtual] || 'Água Consciente';
+  }, [paginaAtual]);
+
+  return (
+    <div className="app-shell">
+      <Header paginaAtual={paginaAtual} setPaginaAtual={setPaginaAtual} />
+      <main id="conteudo" tabIndex="-1">
+        {paginaAtual === 'inicio' && <><Hero setPaginaAtual={setPaginaAtual} /><CardsODS /></>}
+        {paginaAtual === 'dicas' && <Dicas />}
+        {paginaAtual === 'clima' && <ApiClima />}
+        {paginaAtual === 'participe' && <FormularioParticipacao />}
+      </main>
+      <Footer />
+    </div>
+  );
+}
+
+
+===== src/data/dicas.js =====
+export const dicas = [
+  { id: 1, titulo: 'Feche a torneira', categoria: 'Uso doméstico', texto: 'Fechar a torneira ao escovar os dentes reduz desperdícios diários e ajuda a preservar a água potável.' },
+  { id: 2, titulo: 'Repare vazamentos', categoria: 'Manutenção', texto: 'Pequenos vazamentos podem representar grande perda de água ao longo do mês.' },
+  { id: 3, titulo: 'Reutilize água quando possível', categoria: 'Reuso', texto: 'Água da lavagem de roupas pode ser usada para lavar calçadas, respeitando cuidados de higiene.' },
+  { id: 4, titulo: 'Não descarte óleo na pia', categoria: 'Qualidade da água', texto: 'O descarte de óleo prejudica redes de esgoto, rios e solos. O ideal é armazenar e destinar corretamente.' },
+  { id: 5, titulo: 'Use balde em vez de mangueira', categoria: 'Economia', texto: 'Para lavar veículos e áreas externas, o balde reduz o consumo e facilita o controle da água usada.' },
+  { id: 6, titulo: 'Proteja nascentes', categoria: 'Meio ambiente', texto: 'A proteção de nascentes e matas ciliares contribui para a segurança hídrica da comunidade.' },
+  { id: 7, titulo: 'Evite lixo nas ruas', categoria: 'Saneamento', texto: 'Resíduos nas ruas podem entupir bueiros, poluir corpos d’água e agravar alagamentos.' },
+  { id: 8, titulo: 'Compartilhe informação', categoria: 'Educação ambiental', texto: 'A educação ambiental ajuda famílias e estudantes a adotarem hábitos sustentáveis.' }
+];
+
+
+===== src/components/Header.jsx =====
+export default function Header({ paginaAtual, setPaginaAtual }) {
+  const itens = [
+    { id: 'inicio', label: 'Início' },
+    { id: 'dicas', label: 'Dicas' },
+    { id: 'clima', label: 'Dados da API' },
+    { id: 'participe', label: 'Participe' }
+  ];
+
+  return (
+    <header className="app-header">
+      <a className="skip-link" href="#conteudo">Pular para o conteúdo principal</a>
+      <nav className="navbar navbar-expand-lg navbar-dark" aria-label="Navegação principal">
+        <div className="container">
+          <button className="navbar-brand brand-button" onClick={() => setPaginaAtual('inicio')} aria-label="Voltar para o início">
+            <img src="/images/logo-agua.svg" alt="" className="brand-logo" />
+            Água Consciente
+          </button>
+          <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu" aria-controls="menu" aria-expanded="false" aria-label="Abrir menu">
+            <span className="navbar-toggler-icon"></span>
+          </button>
+          <div className="collapse navbar-collapse" id="menu">
+            <ul className="navbar-nav ms-auto">
+              {itens.map((item) => (
+                <li className="nav-item" key={item.id}>
+                  <button
+                    className={`nav-link nav-button ${paginaAtual === item.id ? 'active' : ''}`}
+                    aria-current={paginaAtual === item.id ? 'page' : undefined}
+                    onClick={() => setPaginaAtual(item.id)}
+                  >
+                    {item.label}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </header>
+  );
+}
+
+
+===== src/components/Footer.jsx =====
+export default function Footer() {
+  return (
+    <footer className="app-footer mt-auto">
+      <div className="container py-4 d-flex flex-column flex-md-row justify-content-between gap-2">
+        <p className="mb-0">Água Consciente - ODS 6 | Desenvolvimento Web</p>
+        <p className="mb-0">React + JavaScript + Fetch API + Bootstrap</p>
+      </div>
+    </footer>
+  );
+}
+
+
+===== src/components/Hero.jsx =====
+export default function Hero({ setPaginaAtual }) {
+  return (
+    <section className="hero-section" aria-labelledby="titulo-principal">
+      <div className="container py-5">
+        <div className="row align-items-center g-4">
+          <div className="col-lg-7">
+            <span className="badge rounded-pill ods-badge">ODS 6 - Água Potável e Saneamento</span>
+            <h1 id="titulo-principal" className="display-5 fw-bold mt-3">Pequenas atitudes ajudam a proteger cada gota.</h1>
+            <p className="lead mt-3">Aplicação educativa e interativa sobre economia de água, prevenção da poluição e saneamento, usando React, JavaScript e consumo de dados em JSON.</p>
+            <div className="d-flex gap-2 flex-wrap mt-4">
+              <button className="btn btn-warning fw-semibold" onClick={() => setPaginaAtual('dicas')}>Ver dicas práticas</button>
+              <button className="btn btn-outline-light" onClick={() => setPaginaAtual('clima')}>Consultar dados da API</button>
+            </div>
+          </div>
+          <div className="col-lg-5 text-center">
+            <img src="/images/hero-agua.svg" className="img-fluid hero-img" alt="Ilustração de uma gota de água com folhas, representando preservação ambiental." />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+
+===== src/components/Dicas.jsx =====
+import React from 'react';
+import { dicas } from '../data/dicas.js';
+
+export default function Dicas() {
+  const [busca, setBusca] = React.useState('');
+  const filtradas = dicas.filter((dica) =>
+    `${dica.titulo} ${dica.categoria} ${dica.texto}`.toLowerCase().includes(busca.toLowerCase())
+  );
+
+  return (
+    <section className="container py-5" aria-labelledby="titulo-dicas">
+      <div className="d-flex flex-column flex-lg-row justify-content-between gap-3 align-items-lg-end">
+        <div>
+          <span className="badge text-bg-primary">Interatividade com JavaScript</span>
+          <h2 id="titulo-dicas" className="section-title mt-2">Dicas para cuidar da água</h2>
+          <p className="text-muted mb-0">Digite uma palavra e veja os cartões serem filtrados em tempo real.</p>
+        </div>
+        <div className="search-box">
+          <label htmlFor="busca" className="form-label fw-semibold">Buscar dica</label>
+          <input id="busca" className="form-control" value={busca} onChange={(e) => setBusca(e.target.value)} placeholder="Ex.: óleo, vazamento, nascente" />
+        </div>
+      </div>
+      <p className="mt-3 mb-0"><strong>{filtradas.length}</strong> resultado(s) encontrado(s).</p>
+      <div className="row g-3 mt-2">
+        {filtradas.map((dica) => (
+          <article className="col-md-6 col-xl-3" key={dica.id}>
+            <div className="tip-card h-100">
+              <span>{dica.categoria}</span>
+              <h3>{dica.titulo}</h3>
+              <p>{dica.texto}</p>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+
+===== src/components/FormularioParticipacao.jsx =====
+import React from 'react';
+export default function FormularioParticipacao() {
+  const [form, setForm] = React.useState({ nome: '', tipo: '', mensagem: '' });
+  const [alerta, setAlerta] = React.useState('');
+
+  function atualizar(evento) {
+    const { name, value } = evento.target;
+    setForm((anterior) => ({ ...anterior, [name]: value }));
+  }
+
+  function enviar(evento) {
+    evento.preventDefault();
+    if (!form.nome || !form.tipo || !form.mensagem) {
+      setAlerta('Preencha todos os campos antes de enviar a sugestão.');
+      return;
+    }
+    setAlerta(`Obrigado, ${form.nome}. Sua sugestão sobre ${form.tipo} foi registrada para análise.`);
+    setForm({ nome: '', tipo: '', mensagem: '' });
+  }
+
+  return (
+    <section className="container py-5" aria-labelledby="titulo-participe">
+      <div className="row g-4">
+        <div className="col-lg-5">
+          <span className="badge text-bg-warning">Tratamento de eventos</span>
+          <h2 id="titulo-participe" className="section-title mt-2">Participe da construção</h2>
+          <p>O formulário demonstra validação simples, controle de estado e resposta ao usuário. Nesta versão, os dados não são enviados para banco de dados.</p>
+          <img src="/images/comunidade.svg" className="img-fluid rounded-4" alt="Ilustração de pessoas em uma ação comunitária relacionada ao cuidado com a água." />
+        </div>
+        <div className="col-lg-7">
+          <form className="form-card" onSubmit={enviar} noValidate>
+            {alerta && <div className="alert alert-primary" role="status">{alerta}</div>}
+            <div className="mb-3">
+              <label htmlFor="nome" className="form-label">Nome</label>
+              <input id="nome" name="nome" className="form-control" value={form.nome} onChange={atualizar} placeholder="Digite seu nome" />
+            </div>
+            <div className="mb-3">
+              <label htmlFor="tipo" className="form-label">Tipo de contribuição</label>
+              <select id="tipo" name="tipo" className="form-select" value={form.tipo} onChange={atualizar}>
+                <option value="">Selecione</option>
+                <option>Dica de economia de água</option>
+                <option>Problema de desperdício</option>
+                <option>Ação educativa</option>
+              </select>
+            </div>
+            <div className="mb-3">
+              <label htmlFor="mensagem" className="form-label">Mensagem</label>
+              <textarea id="mensagem" name="mensagem" className="form-control" rows="5" value={form.mensagem} onChange={atualizar} placeholder="Descreva sua sugestão"></textarea>
+            </div>
+            <button className="btn btn-primary" type="submit">Registrar sugestão</button>
+          </form>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+
+===== src/components/CardsODS.jsx =====
+export default function CardsODS() {
+  const cards = [
+    { titulo: 'Água segura', texto: 'Informa sobre o uso consciente e a importância da água potável.' },
+    { titulo: 'Qualidade da água', texto: 'Orienta sobre descarte correto de resíduos e prevenção da poluição.' },
+    { titulo: 'Uso eficiente', texto: 'Apresenta práticas simples para economizar e reduzir desperdícios.' }
+  ];
+  return (
+    <section className="container py-5" aria-labelledby="ods6">
+      <h2 id="ods6" className="section-title">Relação com o ODS 6</h2>
+      <div className="row g-3 mt-2">
+        {cards.map((card) => (
+          <article className="col-md-4" key={card.titulo}>
+            <div className="info-card h-100">
+              <h3>{card.titulo}</h3>
+              <p>{card.texto}</p>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+
+===== src/components/ApiClima.jsx =====
+import React from 'react';
+export default function ApiClima() {
+  const [dados, setDados] = React.useState(null);
+  const [carregando, setCarregando] = React.useState(false);
+  const [erro, setErro] = React.useState('');
+
+  async function consultarAPI() {
+    setCarregando(true);
+    setErro('');
+    try {
+      const url = 'https://api.open-meteo.com/v1/forecast?latitude=-5.82&longitude=-46.14&current=temperature_2m,relative_humidity_2m,precipitation,weather_code&timezone=America%2FSao_Paulo';
+      const resposta = await fetch(url);
+      if (!resposta.ok) throw new Error('Falha ao consultar a API.');
+      const json = await resposta.json();
+      setDados(json.current);
+    } catch (error) {
+      setErro('Não foi possível carregar os dados externos. Verifique a conexão e tente novamente.');
+    } finally {
+      setCarregando(false);
+    }
+  }
+
+  React.useEffect(() => {
+    consultarAPI();
+  }, []);
+
+  return (
+    <section className="container py-5" aria-labelledby="titulo-api">
+      <div className="api-panel">
+        <div className="row align-items-center g-4">
+          <div className="col-lg-6">
+            <span className="badge text-bg-success">Fetch API + JSON</span>
+            <h2 id="titulo-api" className="section-title mt-2">Dados climáticos de Grajaú</h2>
+            <p>A aplicação consulta a API pública Open-Meteo para demonstrar consumo de dados externos em JSON. As informações ajudam a relacionar água, clima, umidade e educação ambiental.</p>
+            <button className="btn btn-primary" onClick={consultarAPI} disabled={carregando}>{carregando ? 'Atualizando...' : 'Atualizar dados'}</button>
+          </div>
+          <div className="col-lg-6">
+            {erro && <div className="alert alert-danger" role="alert">{erro}</div>}
+            {!erro && !dados && <div className="alert alert-info">Carregando dados...</div>}
+            {dados && (
+              <div className="row g-3" aria-live="polite">
+                <div className="col-6"><div className="metric-card"><span>Temperatura</span><strong>{dados.temperature_2m} °C</strong></div></div>
+                <div className="col-6"><div className="metric-card"><span>Umidade</span><strong>{dados.relative_humidity_2m}%</strong></div></div>
+                <div className="col-6"><div className="metric-card"><span>Precipitação</span><strong>{dados.precipitation} mm</strong></div></div>
+                <div className="col-6"><div className="metric-card"><span>Atualização</span><strong>{dados.time?.replace('T', ' ')}</strong></div></div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+
+===== src/styles/global.css =====
+:root {
+  --azul-escuro: #08426c;
+  --azul: #0b76b7;
+  --azul-claro: #eaf7fb;
+  --verde-agua: #00a891;
+  --amarelo: #ffc845;
+  --texto: #17364f;
+  --fundo: #f6fbfd;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; font-family: Arial, Helvetica, sans-serif; color: var(--texto); background: var(--fundo); }
+button, input, select, textarea { font: inherit; }
+.app-shell { min-height: 100vh; display: flex; flex-direction: column; }
+.app-header, .app-footer { background: var(--azul-escuro); color: #fff; }
+.navbar { background: var(--azul-escuro); }
+.brand-button, .nav-button { border: 0; background: transparent; cursor: pointer; }
+.brand-logo { width: 32px; height: 32px; margin-right: .5rem; }
+.nav-button.active { color: var(--amarelo) !important; font-weight: 700; }
+.skip-link { position: absolute; left: -999px; top: 0; background: #fff; color: var(--azul-escuro); padding: .5rem 1rem; z-index: 10; }
+.skip-link:focus { left: .5rem; top: .5rem; }
+:focus-visible { outline: 3px solid var(--amarelo); outline-offset: 3px; }
+.hero-section { color: #fff; background: linear-gradient(135deg, var(--azul-escuro), var(--azul), var(--verde-agua)); }
+.ods-badge { background: #fff; color: var(--azul-escuro); padding: .6rem 1rem; }
+.hero-img { max-height: 290px; background: rgba(255,255,255,.15); border-radius: 28px; padding: 1rem; }
+.section-title { color: var(--azul-escuro); font-weight: 800; letter-spacing: -.02em; }
+.info-card, .tip-card, .form-card, .api-panel { background: #fff; border: 1px solid #d7e6ee; border-radius: 22px; padding: 1.2rem; box-shadow: 0 10px 28px rgba(8,66,108,.07); }
+.info-card h3, .tip-card h3 { color: var(--azul-escuro); font-size: 1.15rem; font-weight: 800; }
+.tip-card span { display: inline-block; margin-bottom: .5rem; font-size: .78rem; color: #fff; background: var(--verde-agua); padding: .28rem .6rem; border-radius: 999px; }
+.search-box { width: min(100%, 360px); }
+.metric-card { background: var(--azul-claro); border-radius: 18px; padding: 1rem; min-height: 115px; }
+.metric-card span { display: block; color: #557086; margin-bottom: .4rem; }
+.metric-card strong { color: var(--azul-escuro); font-size: 1.45rem; }
+.btn-primary { background: var(--azul-escuro); border-color: var(--azul-escuro); }
+.btn-primary:hover { background: #062f4d; border-color: #062f4d; }
+@media (max-width: 576px) {
+  .display-5 { font-size: 2rem; }
+  .section-title { font-size: 1.65rem; }
+  .hero-section .container { padding-top: 2rem !important; padding-bottom: 2rem !important; }
+}
+
